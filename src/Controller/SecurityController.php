@@ -11,6 +11,12 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'app_login', methods: ['POST'])]
     public function index(): Response
     {
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')){
+            return $this->json([
+                'error' => 'Invalid login request: check the Content-Type header.'
+            ]);
+        }
+
         return $this->json([
             'user' => $this->getUser() ? $this->getUser()->getId() : null
         ]);
