@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SecurityController extends AbstractController
 {
+    
     #[Route('/login', name: 'app_login', methods: ['POST'])]
     public function index(): Response
     {
@@ -16,9 +17,10 @@ class SecurityController extends AbstractController
                 'error' => 'Invalid login request: check the Content-Type header.'
             ]);
         }
-
+        /** @var User */
+        $user = $this->getUser();
         return $this->json([
-            'user' => $this->getUser() ? $this->getUser()->getId() : null
+            'user' => $user ? $user->getId() : null
         ]);
     }
 }
