@@ -18,3 +18,4 @@ lexik_jwt_authentication:
         BEARER: 
             httpOnly: true
             samesite: lax
+            secure: false
