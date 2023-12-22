@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -29,19 +30,21 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(),
         new Delete()
     ],
-    normalizationContext:[],
-    denormalizationContext:[]
+    normalizationContext:['groups'=>['user:read']],
+    denormalizationContext:['groups'=> ['user:create', 'user:update']]
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[Assert\Email]
     #[Assert\NotBlank]
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
     private ?string $email = null;
 
     /** @var array<mixed> */
@@ -52,6 +55,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(groups: ['user:create'])]
+    #[Groups(['user:create', 'user:update'])]
     private ?string $password = null;
 
     public function getId(): ?int
