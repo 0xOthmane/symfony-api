@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use App\State\UserPasswordHasher;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -24,10 +25,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations:[
         new GetCollection(),
-        new Post(),
+        new Post(processor: UserPasswordHasher::class),
         new Get(),
-        new Put(),
-        new Patch(),
+        new Put(processor: UserPasswordHasher::class),
+        new Patch(processor: UserPasswordHasher::class),
         new Delete()
     ],
     normalizationContext:['groups'=>['user:read']],
