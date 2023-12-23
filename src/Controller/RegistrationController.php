@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
@@ -25,15 +26,22 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_registration', methods: 'POST')]
-    public function index(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
     {
         $parameters = json_decode($request->getContent(), true);
 
         $user = new User();
         $user->setEmail($parameters['email']);
+        $user->setPlainPassword($parameters['password']);
         if ($parameters['password'] === $parameters['confirmPassword']) {
-            $user->setPassword($userPasswordHasher->hashPassword($user, $parameters['password']));
+            $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPlainPassword()));
         }
+        $errors = $validator->validate($user);
+        if (count($errors)>0){
+            $errorsString = (string) $errors;
+            return new Response($errorsString);
+        }
+        $user->eraseCredentials();
         $entityManager->persist($user);
         $entityManager->flush();
         // generate a signed url and email it to the user
