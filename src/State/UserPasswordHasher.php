@@ -6,9 +6,15 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+/**
+ * @template T 
+ * @implements ProcessorInterface<T> 
+*/
 class UserPasswordHasher implements ProcessorInterface
 {
-
+    /**
+     * @param T $processor
+     */
     public function __construct(private readonly ProcessorInterface $processor, private readonly UserPasswordHasherInterface $passwordHasher)
     {
     }
